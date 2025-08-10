@@ -22,6 +22,14 @@ void app_main(void)
     wifi_connect();
     mqtt_app_start();
 
+    esp_mqtt_client_handle_t mqtt_client = get_mqtt_client();
+    char device_payload[100];
+    snprintf(device_payload, sizeof(device_payload),
+            "{\"device_id\": \"%s\", \"client_id\": \"%s\", \"thing_name\": \"%s\"}",
+            DEVICE_ID, AWS_IOT_CLIENT_ID, AWS_IOT_THING_NAME);
+
+    esp_mqtt_client_publish(mqtt_client, AWS_IOT_DEVICE_TOPIC, device_payload, 0, 1, 0);
+
     while (1) {
         float temperature = 0;
         float humidity = 0;
@@ -29,10 +37,10 @@ void app_main(void)
         if (read_dht11(&temperature, &humidity)) {
             char payload[100];
             snprintf(payload, sizeof(payload),
-                     "{\"sensor_id\": \"%s\", \"temperature\": %.1f, \"humidity\": %.1f}",
-                     SENSOR_ID, temperature, humidity);
+                     "{\"device_id\": \"%s\", \"temperature\": %.1f, \"humidity\": %.1f}",
+                     DEVICE_ID, temperature, humidity);
 
-            esp_mqtt_client_publish(get_mqtt_client(), AWS_IOT_TOPIC, payload, 0, 1, 0);
+            esp_mqtt_client_publish(mqtt_client, AWS_IOT_DHT_TOPIC, payload, 0, 1, 0);
         }
 
         vTaskDelay(pdMS_TO_TICKS(10000));

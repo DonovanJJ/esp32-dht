@@ -1,6 +1,7 @@
 #include "esp_log.h"
 #include "mqtt_client.h"
 
+#include "config.h"
 #include "secrets.h"
 
 #define MQTT_TAG "MQTT"
