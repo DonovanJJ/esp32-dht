@@ -1,7 +1,1 @@
-build/
-sdkconfig
-sdkconfig.old
-
-main/secrets.h
-main/certs
 .vscode
