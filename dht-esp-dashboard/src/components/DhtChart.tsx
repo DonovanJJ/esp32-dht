@@ -36,9 +36,6 @@ type DhtChartProp = {
 export function DhtChart({ device }: DhtChartProp) {
   const [readings, setReadings] = useState<Reading[]>([]);
   const TIME_RANGE = 15;
-  const nowEpoch = Date.now();
-  const startEpoch = nowEpoch - TIME_RANGE * 60 * 1000;
-
 
 useEffect(() => {
   const nowEpoch = Date.now();
