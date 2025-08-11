@@ -4,11 +4,13 @@
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "sdkconfig.h"
+#include "nvs_flash.h"
 
 #include "secrets.h"
 #include "services/mqtt_manager.h"
 #include "services./wifi_manager.h"
 #include "services/dht_manager.h"
+#include "services/nvs_manager.h"
 
 #include "mqtt_client.h"
 #include "esp_tls.h"
@@ -16,6 +18,38 @@
 
 void app_main(void)
 {
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+      ESP_ERROR_CHECK(nvs_flash_erase());
+      ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
+
+    device_detail detail;
+    detail.client_id = NULL;
+    detail.device_id = NULL;
+    ret = read_device_detail(&detail);
+    if (ret == ESP_ERR_NVS_NOT_FOUND) {
+        
+        // TODO: Implement calling of api to obtain device id and client id
+        printf("Fetch from API\n");
+        device_detail mock_detail;
+        mock_detail.client_id = strdup("mock-client-1234");
+        mock_detail.device_id = strdup("mock-device-5678");
+
+        // TODO: Save mock_detail to NVS if needed
+        esp_err_t save_ret = save_device_detail(&mock_detail);
+        if (save_ret == ESP_OK) {
+            printf("Mock device details saved to NVS\n");
+        } else {
+            printf("Failed to save mock device details: %s\n", esp_err_to_name(save_ret));
+        }
+        ret = read_device_detail(&detail);
+        // printf("This is the newly inserted device detail: %s\n", detail->client_id);
+        free(mock_detail.client_id);
+        free(mock_detail.device_id);
+    }
+
     gpio_reset_pin(DHT_GPIO);
     gpio_set_direction(DHT_GPIO, GPIO_MODE_INPUT);
 
