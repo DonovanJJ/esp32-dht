@@ -13,13 +13,40 @@ function DeviceDetailCard({ device }: DeviceDetailCardProps) {
   return (
     <Card className="my-4 shadow-sm" style={{ minWidth: "300px", maxWidth: "600px" }}>
       <CardBody>
-        <CardTitle as="h5" className="mb-3">{device.name}</CardTitle>
-        <CardText>
-          <strong>AWS Client Id:</strong> <span>{device.clientId}</span>
+        <CardTitle as="h5" className="mb-4 text-center">
+          {device.name}
+        </CardTitle>
+
+        <Row className="mb-3">
+          <Col xs={5} className="text-muted fw-semibold">
+            AWS Client Id:
+          </Col>
+          <Col xs={7}>{device.clientId}</Col>
+        </Row>
+
+        <Row className="mb-4">
+          <Col xs={5} className="text-muted fw-semibold">
+            Device Id:
+          </Col>
+          <Col xs={7}>{device.id}</Col>
+        </Row>
+
+        <hr />
+
+        <CardText className="fw-semibold mb-3 text-center fs-6">
+          Current Readings as of <span className="text-primary">Friday 23:49</span>
         </CardText>
-        <CardText>
-          <strong>Device Id:</strong> <span>{device.id}</span>
-        </CardText>
+
+        <Row className="text-center">
+          <Col xs={6} className="border-end">
+            <div className="fw-semibold fs-5 text-danger">30 °C</div>
+            <div className="text-muted">Temperature</div>
+          </Col>
+          <Col xs={6}>
+            <div className="fw-semibold fs-5 text-primary">60%</div>
+            <div className="text-muted">Humidity</div>
+          </Col>
+        </Row>
       </CardBody>
     </Card>
   );
