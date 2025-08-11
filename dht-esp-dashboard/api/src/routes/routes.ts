@@ -1,5 +1,6 @@
 import Router from "@koa/router";
 import { createNewDevice, getDeviceById } from "../service/device";
+import {getTelemetryByIdRange} from "../service/telemetry";
 
 const router = new Router();
 
@@ -40,6 +41,28 @@ router.post("/device", async (ctx, next) => {
     ctx.status = 500;
     ctx.body = { error: "Failed to create device"}
   }
+})
+
+router.get("/telemetry/:id/range/:startTs/:endTs", async (ctx, next) => {
+  const { id, startTs, endTs } = ctx.params;
+
+  const start = Number(startTs);
+  const end = Number(endTs);
+
+  // Validate
+  if (isNaN(start) || isNaN(end)) {
+    ctx.throw(400, "startTs and endTs must be valid timestamps");
+  }
+  try {
+    const telemetryData = await getTelemetryByIdRange(id, start, end);
+    ctx.status = 200;
+    ctx.body = telemetryData;
+  } catch (error) {
+    console.error("Failed to fetch telemetry data:", error);
+    ctx.status = 500;
+    ctx.body = { error: "Failed to fetch telemetry data" };
+  }
+
 })
 
 export default router;

@@ -1,4 +1,4 @@
-export type telemetry = {
+export type Telemetry = {
     device_id: string,
     temperature: number;
     humidity: number;
