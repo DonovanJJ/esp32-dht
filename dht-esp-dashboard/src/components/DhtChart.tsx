@@ -10,7 +10,7 @@ import {
   type ChartOptions,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import {useEffect, useState} from "react";
+import { useEffect } from "react";
 
 ChartJS.register(
   CategoryScale,
@@ -21,15 +21,15 @@ ChartJS.register(
   Legend
 );
 
-type Reading = {
-  time: string;
-  temperature: number;
-  humidity: number;
-}
+// type Reading = {
+//   time: string;
+//   temperature: number;
+//   humidity: number;
+// }
 
 export function DhtChart() {
   const labels = ["mon", "tues", "wed", "thurs", "fri", "sat", "sun"];
-  const [readings, setReadings] = useState<Reading[]>([]);
+  // const [readings, setReadings] = useState<Reading[]>([]);
 
   // useEffect(() => {
   //   const interval = setInterval(() => {
