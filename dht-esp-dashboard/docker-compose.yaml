@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  backend:
+    image: backend
+    container_name: backend
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
+  frontend:
+    image: frontend
+    container_name: frontend
+    ports:
+      - "3001:3000"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+networks:
+  app-network:
+    driver: bridge
