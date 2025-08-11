@@ -1,5 +1,5 @@
 import Router from "koa-router";
-import { getDeviceById } from "../service/devices";
+import { getDeviceById } from "../service/device";
 
 const router = new Router();
 

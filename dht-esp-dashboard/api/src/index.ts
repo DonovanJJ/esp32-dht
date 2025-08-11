@@ -6,10 +6,15 @@ import mqtt from "mqtt";
 import path from "path";
 import fs from "fs"
 import { device } from "aws-iot-device-sdk";
+import bodyParser from "koa-bodyparser";
+import { telemetry } from "./model/telemetry";
+import { putTelemetry } from "./service/telemetry";
 
 const app = new Koa();
 
 const port = 3000;
+
+app.use(bodyParser());
 
 app.use(router.routes());
 
@@ -18,7 +23,7 @@ app.listen(port, () => {
 });
 
 const iotEndpoint = process.env.AWS_IOT_ENDPOINT!;
-const topic = process.env.AWS_IOT_DEVICE_TOPIC || "device"
+const topic = process.env.AWS_IOT_DHT_TOPIC || ""
 
 const certPath = path.resolve(__dirname, "../certs/certificate.pem.crt");
 const keyPath = path.resolve(__dirname, "../certs/private.pem.key");
@@ -61,8 +66,8 @@ awsIotClient.on("message", (topic, payload) => {
   console.log('Topic obtained message from: ', topic);
   try {
     const message = payload.toString();
-    console.log(`📥 Message received on topic ${topic}: ${message}`);
-
+    const data: telemetry = JSON.parse(message);
+    putTelemetry(data);
     // TODO: process the message, e.g. save to DB, trigger other services
   } catch (err) {
     console.error("❌ Error processing message:", err);
