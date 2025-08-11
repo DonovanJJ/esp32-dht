@@ -77,6 +77,6 @@ void app_main(void)
             esp_mqtt_client_publish(mqtt_client, AWS_IOT_DHT_TOPIC, payload, 0, 1, 0);
         }
 
-        vTaskDelay(pdMS_TO_TICKS(10000));
+        vTaskDelay(pdMS_TO_TICKS(60000));
     }
 }

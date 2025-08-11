@@ -25,8 +25,8 @@ ChartJS.register(
 
 type Reading = {
   time: string;
-  temperature: number;
-  humidity: number;
+  temperature: number | null;
+  humidity: number | null;
 }
 
 type DhtChartProp = {
@@ -34,63 +34,91 @@ type DhtChartProp = {
 }
 
 export function DhtChart({ device }: DhtChartProp) {
-  const labels = ["mon", "tues", "wed", "thurs", "fri", "sat", "sun"];
   const [readings, setReadings] = useState<Reading[]>([]);
   const TIME_RANGE = 15;
   const nowEpoch = Date.now();
   const startEpoch = nowEpoch - TIME_RANGE * 60 * 1000;
 
 
-  useEffect(() => {
-    const nowEpoch = Date.now();
-    const startEpoch = nowEpoch - TIME_RANGE * 60 * 1000;
+useEffect(() => {
+  const nowEpoch = Date.now();
+  const startEpoch = nowEpoch - TIME_RANGE * 60 * 1000;
 
-    getTelemetryTimeRange(device.id, startEpoch, nowEpoch)
-      .then((data) => {
-        const formatted = data.map((item) => ({
-          time: new Date(item.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
+  getTelemetryTimeRange(device.id, startEpoch, nowEpoch)
+    .then((data) => {
+      const grouped: Record<string, Reading[]> = {};
+
+      data.forEach((item) => {
+        const date = new Date(item.timestamp);
+        const minuteKey = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        if (!grouped[minuteKey]) {
+          grouped[minuteKey] = [];
+        }
+        grouped[minuteKey].push({
+          time: minuteKey,
           temperature: item.temperature,
           humidity: item.humidity,
-        }));
-        setReadings(formatted);
-      })
-      .catch((error) => {
-        console.error("Error fetching telemetry data:", error);
+        });
       });
-  }, [device.id]);
+
+      const labels: string[] = [];
+      const readingsPerMinute: Reading[] = [];
+
+      for (let i = 0; i < TIME_RANGE; i++) {
+        const minuteDate = new Date(startEpoch + i * 60 * 1000);
+        const label = minuteDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        labels.push(label);
+
+        if (grouped[label]) {
+        const temps = grouped[label]
+          .map(r => r.temperature)
+          .filter((v): v is number => v !== null);
+        const hums = grouped[label]
+          .map(r => r.humidity)
+          .filter((v): v is number => v !== null);
+
+          const avgTemp = temps.reduce((a,b) => a+b, 0) / temps.length;
+          const avgHum = hums.reduce((a,b) => a+b, 0) / hums.length;
+
+          readingsPerMinute.push({
+            time: label,
+            temperature: avgTemp,
+            humidity: avgHum,
+          });
+        } else {
+          readingsPerMinute.push({
+            time: label,
+            temperature: null,
+            humidity: null,
+          });
+        }
+      }
+
+      setReadings(readingsPerMinute);
+    })
+    .catch((error) => {
+      console.error("Error fetching telemetry data:", error);
+    });
+}, [device.id]);
 
   useEffect(() => console.log(readings), [readings]);
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     const now = new Date();
-  //     const newReading: Reading = {
-  //       time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
-  //       temperature: 20 + Math.random() * 5, // mock temp 20–25°C
-  //       humidity: 45 + Math.random() * 10, // mock humidity 45–55%
-  //     };
-  
-  //     setReadings((prev))
-  //   }, [30000])
-  // })
-
-  useEffect(() => {
-    // fetch readings in 15mins interval
-  }, [])
+  const labels = readings.map((r) => r.time);
 
   const data: ChartData<"line"> = {
     labels,
     datasets: [
       {
         label: "Temperature",
-        data: [22, 25, 21, 23, 20, 19, 24],
+        data: readings.map((r) => r.temperature),
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
         yAxisID: "y",
       },
       {
         label: "Humidity (%)",
-        data: [45, 50, 48, 47, 52, 55, 49],
+        data: readings.map((r) => r.humidity),
         borderColor: "rgb(53, 162, 235)",
         backgroundColor: "rgba(53, 162, 235, 0.5)",
         yAxisID: "y1",
@@ -105,6 +133,7 @@ export function DhtChart({ device }: DhtChartProp) {
         type: "linear",
         display: true,
         position: "left",
+        min: 0,
       },
       y1: {
         type: "linear",
@@ -113,6 +142,7 @@ export function DhtChart({ device }: DhtChartProp) {
         grid: {
           drawOnChartArea: false,
         },
+        min: 0
       },
     },
   };

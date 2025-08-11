@@ -3,11 +3,18 @@
 #include "esp_log.h"
 #include "cJSON.h"
 #include <string.h>
+#include <stdlib.h>
 
 static const char *API_TAG = "API_CLIENT";
 static const char *API_URL = "http://{SOME_ENDPOINT}/device";
 
-esp_err_t fetch_device_detail_from_api( *out_detail) {
+// Define the type of out_detail parameter (assuming a struct like this)
+typedef struct {
+    char device_id[64];
+    char client_id[64];
+} device_detail_t;
+
+esp_err_t fetch_device_detail_from_api(device_detail_t *out_detail) {
     if (out_detail == NULL) {
         return ESP_ERR_INVALID_ARG;
     }
