@@ -9,7 +9,7 @@ export async function queryByDeviceId(deviceId: string): Promise<Device | null> 
     const params: GetItemCommandInput = {
         TableName: TABLE,
         Key: {
-            deviceId: { S: deviceId }
+            id: { S: deviceId }
         }
     };
 
@@ -22,7 +22,7 @@ export async function queryByDeviceId(deviceId: string): Promise<Device | null> 
         if (result.Item) {
             const raw = unmarshall(result.Item);
             const mapped: Device = {
-                id: raw.deviceId,
+                id: raw.id,
                 clientId: raw.clientId,
                 name: raw.name
             };
@@ -50,7 +50,7 @@ export async function queryDevices(): Promise<Device[]> {
             return result.Items.map(item => {
                 const raw = unmarshall(item);
                 const mapped: Device = {
-                    id: raw.deviceId ?? raw.id,
+                    id: raw.id,
                     clientId: raw.clientId,
                     name: raw.name,
                 };
