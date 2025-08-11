@@ -1,5 +1,5 @@
 import Router from "koa-router";
-import { getDeviceById } from "../service/device";
+import { createNewDevice, getDeviceById } from "../service/device";
 
 const router = new Router();
 
@@ -28,6 +28,17 @@ router.get("/device/:deviceId", async (ctx, next) => {
     console.log(error);
     ctx.status = 500;
     ctx.body = { error: "Failed to fetch device details"}
+  }
+})
+
+router.post("/device", async (ctx, next) => {
+  try {
+    const res = await createNewDevice();
+    ctx.status = 201;
+    ctx.body = res;
+  } catch (error) {
+    ctx.status = 500;
+    ctx.body = { error: "Failed to create device"}
   }
 })
 
