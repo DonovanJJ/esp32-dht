@@ -9,7 +9,7 @@ export async function putTelemetryItem(newTelemetry: Telemetry) {
     const params: PutItemInput = {
         TableName: TABLE,
         Item: {
-            deviceId: { S: newTelemetry.device_id },
+            deviceId: { S: newTelemetry.deviceId },
             temperature: { N: newTelemetry.temperature.toString() },
             humidity: { N: newTelemetry.humidity.toString() },
             timestamp: { N: newTelemetry.timestamp.toString() },
@@ -47,7 +47,7 @@ export async function getTelemetryInTimeRange(id: string, start: number, end: nu
     const result = await client.send(command);
 
     return (result.Items || []).map((item): Telemetry => ({
-      device_id: item.id.S as string,
+      deviceId: item.deviceId.S as string,
       temperature: Number(item.temperature.N),
       humidity: Number(item.humidity.N),
       timestamp: Number(item.timestamp.N),

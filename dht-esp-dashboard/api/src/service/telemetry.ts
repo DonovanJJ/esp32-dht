@@ -1,12 +1,15 @@
 import { getTelemetryInTimeRange, putTelemetryItem } from "../store/telemetry";
-import { Telemetry } from "../model/telemetry";
+import { Telemetry, Telemetry_MQTT } from "../model/telemetry";
 
 
-export async function putTelemetry(newTelemetry: Telemetry) {
-  const epochMillis = Date.now();
-
-  newTelemetry.timestamp = epochMillis;
-  await putTelemetryItem(newTelemetry);
+export async function putTelemetry(telemetry: Telemetry_MQTT) {
+  const data: Telemetry = {
+    deviceId: telemetry.device_id,
+    temperature: telemetry.temperature,
+    humidity: telemetry.humidity,
+    timestamp: Date.now()
+  }
+  await putTelemetryItem(data);
 }
 
 export async function getTelemetryByIdRange(id: string, startTs: number, endTs: number) {

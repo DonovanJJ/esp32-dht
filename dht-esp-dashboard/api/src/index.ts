@@ -7,7 +7,7 @@ import path from "path";
 import fs from "fs"
 import { device } from "aws-iot-device-sdk";
 import bodyParser from "koa-bodyparser";
-import { Telemetry } from "./model/telemetry";
+import { Telemetry, Telemetry_MQTT } from "./model/telemetry";
 import { putTelemetry } from "./service/telemetry";
 
 const app = new Koa();
@@ -66,9 +66,8 @@ awsIotClient.on("message", (topic, payload) => {
   console.log('Topic obtained message from: ', topic);
   try {
     const message = payload.toString();
-    const data: Telemetry = JSON.parse(message);
+    const data: Telemetry_MQTT = JSON.parse(message);
     putTelemetry(data);
-    // TODO: process the message, e.g. save to DB, trigger other services
   } catch (err) {
     console.error("❌ Error processing message:", err);
   }
