@@ -1,22 +1,33 @@
-import { DynamoDBClient, QueryCommand, QueryInput } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, GetItemCommandInput, GetItemCommand, AttributeValue } from "@aws-sdk/client-dynamodb";
+import { unmarshall } from "@aws-sdk/util-dynamodb";
+import { device } from "../model/device";
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION });
 
-export async function queryByDeviceId(deviceId: string) {
-    const params: QueryInput = {
+export async function queryByDeviceId(deviceId: string): Promise<device | null> {
+    const params: GetItemCommandInput = {
         TableName: "devices",
-        KeyConditionExpression: "deviceId = :id",
-        ExpressionAttributeValues: {
-        ":id": { S: deviceId }
+        Key: {
+            deviceId: { S: deviceId }
         }
     };
 
-    const command = new QueryCommand(params);
+    const command = new GetItemCommand(params);
     
     try {
         const result = await client.send(command);
-        console.log("Query succeeded:", result.Items);
-        return result.Items;
+        console.log("Query succeeded:", result.Item);
+
+        if (result.Item) {
+            const raw = unmarshall(result.Item);
+            const mapped: device = {
+                id: raw.deviceId,
+                clientId: raw.clientId,
+                name: raw.name
+            };
+            return mapped;
+        }
+        return null;
     } catch (error) {
         console.error("Error querying table:", error);
         throw error;

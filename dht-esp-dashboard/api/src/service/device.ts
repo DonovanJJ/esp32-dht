@@ -1,8 +1,8 @@
+import { device } from "../model/device";
 import { queryByDeviceId } from "../store/device";
 
-export async function getDeviceById(deviceId: string) {
+export async function getDeviceById(deviceId: string): Promise<device | null> {
     const res = await queryByDeviceId(deviceId);
-    console.log(res);
     return res;
 }
 
