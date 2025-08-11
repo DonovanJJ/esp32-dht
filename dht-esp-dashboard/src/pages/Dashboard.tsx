@@ -15,7 +15,7 @@ function DeviceDetailCard({ device }: DeviceDetailCardProps) {
       <CardBody>
         <CardTitle as="h5" className="mb-3">{device.name}</CardTitle>
         <CardText>
-          <strong>AWS Client Id:</strong> <span>{device.client_id}</span>
+          <strong>AWS Client Id:</strong> <span>{device.clientId}</span>
         </CardText>
         <CardText>
           <strong>Device Id:</strong> <span>{device.id}</span>
@@ -57,7 +57,7 @@ function Dashboard() {
 
           <Row className="w-100 justify-content-center">
             <Col xs={12} md={8}>
-              <DhtChart />
+              <DhtChart device={selectedDevice}/>
             </Col>
           </Row>
         </>

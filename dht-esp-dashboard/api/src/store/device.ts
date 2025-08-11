@@ -1,4 +1,4 @@
-import { DynamoDBClient, GetItemCommandInput, GetItemCommand, PutItemCommandInput, PutItemCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, GetItemCommandInput, GetItemCommand, ScanCommandInput, ScanCommand, PutItemCommandInput, PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { Device } from "../model/device";
 
@@ -31,6 +31,35 @@ export async function queryByDeviceId(deviceId: string): Promise<Device | null> 
         return null;
     } catch (error) {
         console.error("Error querying table:", error);
+        throw error;
+    }
+}
+
+export async function queryDevices(): Promise<Device[]> {
+    const params: ScanCommandInput = {
+        TableName: TABLE,
+    };
+
+    const command = new ScanCommand(params);
+
+    try {
+        const result = await client.send(command);
+        console.log("Scan succeeded:", result.Items);
+
+        if (result.Items) {
+            return result.Items.map(item => {
+                const raw = unmarshall(item);
+                const mapped: Device = {
+                    id: raw.deviceId ?? raw.id,
+                    clientId: raw.clientId,
+                    name: raw.name,
+                };
+                return mapped;
+            });
+        }
+        return [];
+    } catch (error) {
+        console.error("Error scanning table:", error);
         throw error;
     }
 }

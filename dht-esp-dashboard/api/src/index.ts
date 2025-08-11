@@ -1,6 +1,7 @@
 import "dotenv/config";
 
 import Koa from "koa";
+import cors from "@koa/cors";
 import router from "./routes/routes"
 import mqtt from "mqtt";
 import path from "path";
@@ -13,6 +14,8 @@ import { putTelemetry } from "./service/telemetry";
 const app = new Koa();
 
 const port = 3000;
+
+app.use(cors());
 
 app.use(bodyParser());
 

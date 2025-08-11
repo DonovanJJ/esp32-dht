@@ -10,7 +10,9 @@ import {
   type ChartOptions,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { getTelemetryTimeRange } from "../clients/telemetry";
+import type { Device } from "../models/Device";
 
 ChartJS.register(
   CategoryScale,
@@ -21,15 +23,43 @@ ChartJS.register(
   Legend
 );
 
-// type Reading = {
-//   time: string;
-//   temperature: number;
-//   humidity: number;
-// }
+type Reading = {
+  time: string;
+  temperature: number;
+  humidity: number;
+}
 
-export function DhtChart() {
+type DhtChartProp = {
+  device: Device;
+}
+
+export function DhtChart({ device }: DhtChartProp) {
   const labels = ["mon", "tues", "wed", "thurs", "fri", "sat", "sun"];
-  // const [readings, setReadings] = useState<Reading[]>([]);
+  const [readings, setReadings] = useState<Reading[]>([]);
+  const TIME_RANGE = 15;
+  const nowEpoch = Date.now();
+  const startEpoch = nowEpoch - TIME_RANGE * 60 * 1000;
+
+
+  useEffect(() => {
+    const nowEpoch = Date.now();
+    const startEpoch = nowEpoch - TIME_RANGE * 60 * 1000;
+
+    getTelemetryTimeRange(device.id, startEpoch, nowEpoch)
+      .then((data) => {
+        const formatted = data.map((item) => ({
+          time: new Date(item.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
+          temperature: item.temperature,
+          humidity: item.humidity,
+        }));
+        setReadings(formatted);
+      })
+      .catch((error) => {
+        console.error("Error fetching telemetry data:", error);
+      });
+  }, [device.id]);
+
+  useEffect(() => console.log(readings), [readings]);
 
   // useEffect(() => {
   //   const interval = setInterval(() => {
@@ -39,7 +69,7 @@ export function DhtChart() {
   //       temperature: 20 + Math.random() * 5, // mock temp 20–25°C
   //       humidity: 45 + Math.random() * 10, // mock humidity 45–55%
   //     };
-  //
+  
   //     setReadings((prev))
   //   }, [30000])
   // })

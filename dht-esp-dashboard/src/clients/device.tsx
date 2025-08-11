@@ -1,19 +1,15 @@
+import axios from "axios";
 import type {Device} from "../models/Device.ts";
 
-export async function getAvailableDevices(): Promise<Device[]> {
-  const devices: Device[] = [
-    {
-      id: "id1",
-      name: "device_name_1",
-      client_id: "client_id1",
-    },
-    {
-      id: "id2",
-      name: "device_name_2",
-      client_id: "client_id2",
-    }
-  ];
-  console.log(devices);
+const END_POINT = "localhost:3000"
 
-  return Promise.resolve(devices);
+export async function getAvailableDevices(): Promise<Device[]> {
+  const url = `http://${END_POINT}/devices`
+  try {
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch telemetry data: ", error);
+    return [];
+  }
 }

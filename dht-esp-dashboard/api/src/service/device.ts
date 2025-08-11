@@ -1,10 +1,14 @@
 import { v4 as uuidv4 } from "uuid";
 import { CreateNewDeviceResponse, Device } from "../model/device";
-import { putDeviceItem, queryByDeviceId } from "../store/device";
+import { putDeviceItem, queryByDeviceId, queryDevices } from "../store/device";
 
 export async function getDeviceById(deviceId: string): Promise<Device | null> {
     const res = await queryByDeviceId(deviceId);
     return res;
+}
+
+export async function getDevices(): Promise<Device[]>{
+  return await queryDevices();
 }
 
 async function createDevice(device: Device): Promise<void> {

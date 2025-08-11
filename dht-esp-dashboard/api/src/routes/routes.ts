@@ -1,5 +1,5 @@
 import Router from "@koa/router";
-import { createNewDevice, getDeviceById } from "../service/device";
+import { createNewDevice, getDeviceById, getDevices } from "../service/device";
 import {getTelemetryByIdRange} from "../service/telemetry";
 
 const router = new Router();
@@ -29,6 +29,17 @@ router.get("/device/:deviceId", async (ctx, next) => {
     console.log(error);
     ctx.status = 500;
     ctx.body = { error: "Failed to fetch device details"}
+  }
+})
+
+router.get("/devices", async(ctx, next) => {
+  try {
+    const devices = await getDevices();
+    ctx.status = 200;
+    ctx.body = devices;
+  } catch (error) {
+    ctx.status = 500;
+    ctx.body = { error: "Failed to fetch devices"}
   }
 })
 
