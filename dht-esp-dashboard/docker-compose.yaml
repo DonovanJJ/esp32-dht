@@ -3,16 +3,15 @@ version: "3.8"
 services:
   backend:
     image: backend
-    container_name: backend
     ports:
       - "3000:3000"
     networks:
       - app-network
 
   frontend:
-    container_name: frontend
+    image: frontend
     ports:
-      - "3001:80" 
+      - "80:80"
     networks:
       - app-network
     depends_on:
