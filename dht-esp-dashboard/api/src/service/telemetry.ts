@@ -9,6 +9,7 @@ export async function putTelemetry(telemetry: Telemetry_MQTT) {
     humidity: telemetry.humidity,
     timestamp: Date.now()
   }
+  console.log(`Received telemetry data at ${data.timestamp}`);
   await putTelemetryItem(data);
 }
 
