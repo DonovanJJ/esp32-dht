@@ -13,7 +13,7 @@ services:
     image: frontend
     container_name: frontend
     ports:
-      - "3001:3000"
+      - "3001:3001"
     networks:
       - app-network
     depends_on:
