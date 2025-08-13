@@ -1,7 +1,6 @@
 import "dotenv/config";
 
 import Koa from "koa";
-import cors from "@koa/cors";
 import router from "./routes/routes"
 import mqtt from "mqtt";
 import path from "path";
