@@ -10,10 +10,9 @@ services:
       - app-network
 
   frontend:
-    image: frontend
     container_name: frontend
     ports:
-      - "3001:3001"
+      - "3001:80" 
     networks:
       - app-network
     depends_on:
