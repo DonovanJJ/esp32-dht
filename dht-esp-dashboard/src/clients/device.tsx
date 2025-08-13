@@ -1,7 +1,7 @@
 import axios from "axios";
 import type {Device} from "../models/Device.ts";
 
-const END_POINT = "/api"
+const END_POINT = "http://localhost:3000"
 
 export async function getAvailableDevices(): Promise<Device[]> {
   const url = `${END_POINT}/devices`

@@ -3,7 +3,7 @@ import { Card, CardBody, CardTitle, CardText, Container, Row, Col } from "react-
 import Dropdown from "../components/DropdownComponent.tsx";
 import { getAvailableDevices } from "../clients/device.tsx";
 import type { Device } from "../models/Device.ts";
-import { DhtChart } from "../components/DhtChart.tsx";
+import { DhtChart, SelectedTimeRangeConfig, type SelectedTimeRangeConfigKey } from "../components/DhtChart.tsx";
 
 interface DeviceDetailCardProps {
   device: Device;
@@ -56,6 +56,7 @@ function Dashboard() {
   const [devices, setDevices] = useState<Device[]>([]);
   const [selectedDeviceName, setSelectedDeviceName] = useState<string>("");
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
+  const [selectedTimeRange, setSelectedTimeRange] = useState<SelectedTimeRangeConfigKey>("FifteenMinutes")
 
   useEffect(() => {
     getAvailableDevices().then(setDevices);
@@ -71,9 +72,22 @@ function Dashboard() {
       <Row className="mb-4 w-100 justify-content-center">
         <Col xs={12} md={6}>
           <Dropdown
-            items={devices.map((d) => d.name)}
+            items={devices.map((d) => ({
+              key: d.name,
+              label: d.name
+            }))}
             selectedItem={selectedDeviceName}
             onSelectItem={setSelectedDeviceName}
+          />
+        </Col>
+        <Col>
+          <Dropdown
+            items={Object.entries(SelectedTimeRangeConfig).map(([key, cfg]) => ({
+              key,
+              label: cfg.display,
+            }))}
+            selectedItem={selectedTimeRange}
+            onSelectItem={setSelectedTimeRange}
           />
         </Col>
       </Row>
@@ -84,7 +98,7 @@ function Dashboard() {
 
           <Row className="w-100 justify-content-center">
             <Col xs={12} md={8}>
-              <DhtChart device={selectedDevice}/>
+              <DhtChart device={selectedDevice} timeRange={selectedTimeRange}/>
             </Col>
           </Row>
         </>

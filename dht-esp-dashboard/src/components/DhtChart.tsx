@@ -29,77 +29,124 @@ type Reading = {
   humidity: number | null;
 }
 
-type DhtChartProp = {
-  device: Device;
+export type TimeRangeConfig = {
+  timeInterval: number;
+  timeRange: number;
+  columnCount: number;
+  display: string;
 }
 
-export function DhtChart({ device }: DhtChartProp) {
+export const SelectedTimeRangeConfig = {
+  FifteenMinutes: {
+    timeInterval: 60 * 1000,
+    timeRange: 15 * 60 * 1000,
+    columnCount: 15,
+    display: "15 Minutes"
+  },
+  OneHour: {
+    timeInterval: 60 * 1000,
+    timeRange: 60 * 60 * 1000,
+    columnCount: 60,
+    display: "1 Hour"
+  },
+  OneDay: {
+    timeInterval: 60 * 60 * 1000,
+    timeRange: 24 * 60 * 60 * 1000,
+    columnCount: 24,
+    display: "1 Day"
+  },
+  SevenDays: {
+    timeInterval: 24 * 60 * 60 * 1000,
+    timeRange: 7 * 24 * 60 * 60 * 1000,
+    columnCount: 7,
+    display: "7 Days"
+  }
+}
+
+export type SelectedTimeRangeConfigKey = keyof typeof SelectedTimeRangeConfig;
+
+type DhtChartProp = {
+  device: Device;
+  timeRange: SelectedTimeRangeConfigKey;
+}
+
+export function DhtChart({ device, timeRange }: DhtChartProp) {
   const [readings, setReadings] = useState<Reading[]>([]);
-  const TIME_RANGE = 15;
 
-useEffect(() => {
-  const nowEpoch = Date.now();
-  const startEpoch = nowEpoch - TIME_RANGE * 60 * 1000;
+  useEffect(() => {
+    const nowEpoch = Date.now();
+    const rangeConfig = SelectedTimeRangeConfig[timeRange];
+    const startEpoch = nowEpoch - rangeConfig.timeRange;
 
-  getTelemetryTimeRange(device.id, startEpoch, nowEpoch)
-    .then((data) => {
-      const grouped: Record<string, Reading[]> = {};
+    getTelemetryTimeRange(device.id, startEpoch, nowEpoch)
+      .then((data) => {
+        const grouped: Record<string, Reading[]> = {};
 
-      data.forEach((item) => {
-        const date = new Date(item.timestamp);
-        const minuteKey = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        
-        if (!grouped[minuteKey]) {
-          grouped[minuteKey] = [];
-        }
-        grouped[minuteKey].push({
-          time: minuteKey,
-          temperature: item.temperature,
-          humidity: item.humidity,
+        data.forEach((item) => {
+          const date = new Date(item.timestamp);
+          const key = date.toLocaleTimeString([], {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+
+          if (!grouped[key]) {
+            grouped[key] = [];
+          }
+          grouped[key].push({
+            time: key,
+            temperature: item.temperature,
+            humidity: item.humidity,
+          });
         });
-      });
 
-      const labels: string[] = [];
-      const readingsPerMinute: Reading[] = [];
+        const labels: string[] = [];
+        const readingsPerDataPoint: Reading[] = [];
 
-      for (let i = 0; i < TIME_RANGE; i++) {
-        const minuteDate = new Date(startEpoch + i * 60 * 1000);
-        const label = minuteDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        labels.push(label);
+        for (let i = 0; i < rangeConfig.columnCount; i++) {
+          const dateTimeDataPoint = new Date(startEpoch + i * rangeConfig.timeInterval);
+          const label = dateTimeDataPoint.toLocaleTimeString([], {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+          labels.push(label);
 
-        if (grouped[label]) {
-        const temps = grouped[label]
-          .map(r => r.temperature)
-          .filter((v): v is number => v !== null);
-        const hums = grouped[label]
-          .map(r => r.humidity)
-          .filter((v): v is number => v !== null);
+          if (grouped[label]) {
+          const temps = grouped[label]
+            .map(r => r.temperature)
+            .filter((v): v is number => v !== null);
+          const hums = grouped[label]
+            .map(r => r.humidity)
+            .filter((v): v is number => v !== null);
 
-          const avgTemp = temps.reduce((a,b) => a+b, 0) / temps.length;
-          const avgHum = hums.reduce((a,b) => a+b, 0) / hums.length;
+            const avgTemp = temps.reduce((a,b) => a+b, 0) / temps.length;
+            const avgHum = hums.reduce((a,b) => a+b, 0) / hums.length;
 
-          readingsPerMinute.push({
-            time: label,
-            temperature: avgTemp,
-            humidity: avgHum,
-          });
-        } else {
-          readingsPerMinute.push({
-            time: label,
-            temperature: null,
-            humidity: null,
-          });
+            readingsPerDataPoint.push({
+              time: label,
+              temperature: avgTemp,
+              humidity: avgHum,
+            });
+          } else {
+            readingsPerDataPoint.push({
+              time: label,
+              temperature: null,
+              humidity: null,
+            });
+          }
         }
-      }
 
-      setReadings(readingsPerMinute);
-    })
-    .catch((error) => {
-      console.error("Error fetching telemetry data:", error);
-    });
-}, [device.id]);
-
-  useEffect(() => console.log(readings), [readings]);
+        setReadings(readingsPerDataPoint);
+      })
+      .catch((error) => {
+        console.error("Error fetching telemetry data:", error);
+      });
+  }, [device.id, timeRange]);
 
   const labels = readings.map((r) => r.time);
 

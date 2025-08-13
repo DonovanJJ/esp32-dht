@@ -1,13 +1,17 @@
 import Dropdown from 'react-bootstrap/Dropdown';
 
+type DropDownItem = {
+  key: string;
+  label: string;
+}
+
 type DropdownComponentProps = {
-  items: string[];
+  items: DropDownItem[];
   selectedItem: string;
-  onSelectItem: (item: string) => void;
+  onSelectItem: (key: any) => void;
 };
 
 function DropdownComponent({ items, selectedItem, onSelectItem }: DropdownComponentProps) {
-
   return (
     <Dropdown>
       <Dropdown.Toggle variant="success" id="dropdown-basic">
@@ -20,17 +24,14 @@ function DropdownComponent({ items, selectedItem, onSelectItem }: DropdownCompon
             return (
               <Dropdown.Item
                 key={idx}
-                active={item === selectedItem}
-                onClick={() => onSelectItem(item)}
+                active={item.key === selectedItem}
+                onClick={() => onSelectItem(item.key)}
               >
-                {item}
+                {item.label}
               </Dropdown.Item>
             )
           })
         }
-        {/*<Dropdown.Item href="#/action-1">Action</Dropdown.Item>*/}
-        {/*<Dropdown.Item href="#/action-2">Another action</Dropdown.Item>*/}
-        {/*<Dropdown.Item href="#/action-3">Something else</Dropdown.Item>*/}
       </Dropdown.Menu>
     </Dropdown>
   );
