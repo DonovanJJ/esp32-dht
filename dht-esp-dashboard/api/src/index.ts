@@ -8,7 +8,7 @@ import path from "path";
 import fs from "fs"
 import { device } from "aws-iot-device-sdk";
 import bodyParser from "koa-bodyparser";
-import { Telemetry, Telemetry_MQTT } from "./model/telemetry";
+import { Telemetry_MQTT } from "./model/telemetry";
 import { putTelemetry } from "./service/telemetry";
 
 const app = new Koa();
