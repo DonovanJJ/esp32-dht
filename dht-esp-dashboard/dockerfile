@@ -14,7 +14,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2 — Serve with Nginx
-FROM nginx:stable-alpine
+FROM nginx:stable-perl
 
 RUN rm -rf /usr/share/nginx/html/*
 
