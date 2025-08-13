@@ -15,8 +15,6 @@ const app = new Koa();
 
 const port = 3000;
 
-app.use(cors());
-
 app.use(bodyParser());
 
 app.use(router.routes());
