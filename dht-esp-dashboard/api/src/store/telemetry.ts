@@ -57,3 +57,35 @@ export async function getTelemetryInTimeRange(id: string, start: number, end: nu
     throw error;
   }
 }
+
+export async function getLatestTelemetry(id: string): Promise<Telemetry | null> {
+  const params: QueryInput = {
+    TableName: TABLE,
+    KeyConditionExpression: "deviceId = :deviceId",
+    ExpressionAttributeValues: {
+      ":deviceId": { S: id },
+    },
+    ScanIndexForward: false,
+    Limit: 1,
+  };
+
+  try {
+    const command = new QueryCommand(params);
+    const result = await client.send(command);
+
+    if (!result || !result.Items || result.Items.length === 0) {
+      return null;
+    }
+
+    const item = result.Items[0];
+    return {
+      deviceId: item.deviceId.S as string,
+      temperature: Number(item.temperature.N),
+      humidity: Number(item.humidity.N),
+      timestamp: Number(item.timestamp.N),
+    }
+  } catch (error) {
+    console.error("Error querying latest telemetry:", error);
+    throw error;
+  }
+}

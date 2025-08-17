@@ -1,6 +1,6 @@
 import Router from "@koa/router";
 import { createNewDevice, getDeviceById, getDevices } from "../service/device";
-import {getTelemetryByIdRange} from "../service/telemetry";
+import {getLastestTelemetry, getTelemetryByIdRange} from "../service/telemetry";
 
 const router = new Router();
 
@@ -51,6 +51,30 @@ router.post("/device", async (ctx, next) => {
   } catch (error) {
     ctx.status = 500;
     ctx.body = { error: "Failed to create device"}
+  }
+})
+
+router.get("/device/:id/telemetry/latest", async (ctx, next) => {
+  const { id } = ctx.params;
+
+  if (!id) {
+    ctx.status = 400;
+    ctx.body = { error: "Missing deviceId path parameter" };
+    return;
+  }
+  try {
+    const device = await getLastestTelemetry(id);
+    if (!device) {
+      ctx.status = 404;
+      ctx.body = { error: "Device details not found" };
+      return;
+    }
+    ctx.status = 200;
+    ctx.body = device;
+  } catch (error) {
+    console.log(error);
+    ctx.status = 500;
+    ctx.body = { error: "Failed to fetch device details"}
   }
 })
 

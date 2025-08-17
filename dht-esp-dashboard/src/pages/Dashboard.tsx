@@ -4,12 +4,15 @@ import Dropdown from "../components/DropdownComponent.tsx";
 import { getAvailableDevices } from "../clients/device.tsx";
 import type { Device } from "../models/Device.ts";
 import { DhtChart, SelectedTimeRangeConfig, type SelectedTimeRangeConfigKey } from "../components/DhtChart.tsx";
+import { getLatestTelemetry } from "../clients/telemetry.tsx";
+import type {Telemetry} from "../models/Telemetry.ts";
 
 interface DeviceDetailCardProps {
   device: Device;
+  telemetry?: Telemetry;
 }
 
-function DeviceDetailCard({ device }: DeviceDetailCardProps) {
+function DeviceDetailCard({ device, telemetry }: DeviceDetailCardProps) {
   return (
     <Card className="my-4 shadow-sm" style={{ minWidth: "300px", maxWidth: "600px" }}>
       <CardBody>
@@ -33,20 +36,33 @@ function DeviceDetailCard({ device }: DeviceDetailCardProps) {
 
         <hr />
 
-        <CardText className="fw-semibold mb-3 text-center fs-6">
-          Current Readings as of <span className="text-primary">Friday 23:49</span>
-        </CardText>
+        {telemetry ? (
+          <>
+            <CardText className="fw-semibold mb-3 text-center fs-6">
+              Current Readings as of{" "}
+              <span className="text-primary">
+                {new Date(telemetry.timestamp).toLocaleString()}
+              </span>
+            </CardText>
 
-        <Row className="text-center">
-          <Col xs={6} className="border-end">
-            <div className="fw-semibold fs-5 text-danger">30 °C</div>
-            <div className="text-muted">Temperature</div>
-          </Col>
-          <Col xs={6}>
-            <div className="fw-semibold fs-5 text-primary">60%</div>
-            <div className="text-muted">Humidity</div>
-          </Col>
-        </Row>
+            <Row className="text-center">
+              <Col xs={6} className="border-end">
+                <div className="fw-semibold fs-5 text-danger">
+                  {telemetry.temperature} °C
+                </div>
+                <div className="text-muted">Temperature</div>
+              </Col>
+              <Col xs={6}>
+                <div className="fw-semibold fs-5 text-primary">
+                  {telemetry.humidity}%
+                </div>
+                <div className="text-muted">Humidity</div>
+              </Col>
+            </Row>
+          </>
+        ) : (
+          <div className="text-muted text-center">No Telemetry data detected</div>
+        )}
       </CardBody>
     </Card>
   );
@@ -58,6 +74,8 @@ function Dashboard() {
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState<SelectedTimeRangeConfigKey>("FifteenMinutes")
 
+  const [latestTelemetry, setLatestTelemetry] = useState<Telemetry>();
+
   useEffect(() => {
     getAvailableDevices().then(setDevices);
   }, []);
@@ -66,6 +84,18 @@ function Dashboard() {
     const d = devices.find((device) => device.name === selectedDeviceName) ?? null;
     setSelectedDevice(d);
   }, [devices, selectedDeviceName]);
+
+  useEffect(() => {
+    if (selectedDevice) {
+      getLatestTelemetry(selectedDevice.id)
+        .then((data) => {
+          if (data) {
+            setLatestTelemetry(data);
+          }
+        })
+    }
+
+  }, [selectedDevice])
 
   return (
     <Container className="d-flex flex-column align-items-center mt-5" style={{ minWidth: "50vw" }}>
@@ -94,7 +124,7 @@ function Dashboard() {
 
       {selectedDevice ? (
         <>
-          <DeviceDetailCard device={selectedDevice} />
+          <DeviceDetailCard device={selectedDevice} telemetry={latestTelemetry}/>
 
           <Row className="w-100 justify-content-center">
             <Col xs={12} md={8}>

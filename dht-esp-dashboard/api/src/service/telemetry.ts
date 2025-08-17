@@ -1,4 +1,4 @@
-import { getTelemetryInTimeRange, putTelemetryItem } from "../store/telemetry";
+import {getLatestTelemetry, getTelemetryInTimeRange, putTelemetryItem} from "../store/telemetry";
 import { Telemetry, Telemetry_MQTT } from "../model/telemetry";
 
 
@@ -15,4 +15,8 @@ export async function putTelemetry(telemetry: Telemetry_MQTT) {
 
 export async function getTelemetryByIdRange(id: string, startTs: number, endTs: number) {
   return await getTelemetryInTimeRange(id, startTs, endTs);
+}
+
+export async function getLastestTelemetry(id: string) {
+  return await getLatestTelemetry(id);
 }
