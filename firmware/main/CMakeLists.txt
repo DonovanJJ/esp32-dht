@@ -1,4 +1,4 @@
-idf_component_register(SRCS "main.c" "services/mqtt_manager.c" "services/wifi_manager.c" "services/dht_manager.c"
+idf_component_register(SRCS "main.c" "services/mqtt_manager.c" "services/wifi_manager.c" "services/dht_manager.c" "services/nvs_manager.c" "services/http_manager.c"
                     INCLUDE_DIRS "."
                     EMBED_TXTFILES
                         "./certs/root-ca.pem"

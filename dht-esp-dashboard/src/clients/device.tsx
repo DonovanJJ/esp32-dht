@@ -1,0 +1,15 @@
+import axios from "axios";
+import type {Device} from "../models/Device.ts";
+
+const END_POINT = "/api"
+
+export async function getAvailableDevices(): Promise<Device[]> {
+  const url = `${END_POINT}/devices`
+  try {
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch telemetry data: ", error);
+    return [];
+  }
+}
