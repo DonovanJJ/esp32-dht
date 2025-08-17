@@ -8,30 +8,28 @@ type DropDownItem = {
 type DropdownComponentProps = {
   items: DropDownItem[];
   selectedItem: string;
-  onSelectItem: (key: any) => void;
+  onSelectItem: (key: string) => void;
 };
 
 function DropdownComponent({ items, selectedItem, onSelectItem }: DropdownComponentProps) {
+  const selected = items.find((item) => item.key === selectedItem);
+
   return (
     <Dropdown>
       <Dropdown.Toggle variant="success" id="dropdown-basic">
-        {selectedItem ? selectedItem : "Select a device"}
+        {selected ? selected.label : "Select an option"}
       </Dropdown.Toggle>
 
       <Dropdown.Menu>
-        {
-          items.map((item, idx) => {
-            return (
-              <Dropdown.Item
-                key={idx}
-                active={item.key === selectedItem}
-                onClick={() => onSelectItem(item.key)}
-              >
-                {item.label}
-              </Dropdown.Item>
-            )
-          })
-        }
+        {items.map((item) => (
+          <Dropdown.Item
+            key={item.key}
+            active={item.key === selectedItem}
+            onClick={() => onSelectItem(item.key)}
+          >
+            {item.label}
+          </Dropdown.Item>
+        ))}
       </Dropdown.Menu>
     </Dropdown>
   );

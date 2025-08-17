@@ -1,18 +1,19 @@
 import {
-  Chart as ChartJS,
   CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend,
+  Chart as ChartJS,
   type ChartData,
   type ChartOptions,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Tooltip,
 } from "chart.js";
-import { Line } from "react-chartjs-2";
-import { useEffect, useState } from "react";
-import { getTelemetryTimeRange } from "../clients/telemetry";
-import type { Device } from "../models/Device";
+import {Line} from "react-chartjs-2";
+import {useEffect, useState} from "react";
+import {getTelemetryTimeRange} from "../clients/telemetry";
+import type {Device} from "../models/Device";
+import {SelectedTimeRangeConfig} from "./SelectedTimeRangeConfig.tsx";
 
 ChartJS.register(
   CategoryScale,
@@ -34,33 +35,6 @@ export type TimeRangeConfig = {
   timeRange: number;
   columnCount: number;
   display: string;
-}
-
-export const SelectedTimeRangeConfig = {
-  FifteenMinutes: {
-    timeInterval: 60 * 1000,
-    timeRange: 15 * 60 * 1000,
-    columnCount: 15,
-    display: "15 Minutes"
-  },
-  OneHour: {
-    timeInterval: 60 * 1000,
-    timeRange: 60 * 60 * 1000,
-    columnCount: 60,
-    display: "1 Hour"
-  },
-  OneDay: {
-    timeInterval: 60 * 60 * 1000,
-    timeRange: 24 * 60 * 60 * 1000,
-    columnCount: 24,
-    display: "1 Day"
-  },
-  SevenDays: {
-    timeInterval: 24 * 60 * 60 * 1000,
-    timeRange: 7 * 24 * 60 * 60 * 1000,
-    columnCount: 7,
-    display: "7 Days"
-  }
 }
 
 export type SelectedTimeRangeConfigKey = keyof typeof SelectedTimeRangeConfig;
