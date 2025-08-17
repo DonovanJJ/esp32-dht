@@ -30,7 +30,7 @@ router.get("/device/:deviceId", async (ctx, next) => {
     ctx.status = 500;
     ctx.body = { error: "Failed to fetch device details"}
   }
-})
+});
 
 router.get("/devices", async(ctx, next) => {
   try {
@@ -54,7 +54,7 @@ router.post("/device", async (ctx, next) => {
   }
 })
 
-router.get("/telemetry/:id/range/:startTs/:endTs", async (ctx, next) => {
+router.get("/device/:id/telemetry/range/:startTs/:endTs", async (ctx, next) => {
   const { id, startTs, endTs } = ctx.params;
 
   const start = Number(startTs);
