@@ -3,9 +3,10 @@ import { Card, CardBody, CardTitle, CardText, Container, Row, Col } from "react-
 import Dropdown from "../components/DropdownComponent.tsx";
 import { getAvailableDevices } from "../clients/device.tsx";
 import type { Device } from "../models/Device.ts";
-import { DhtChart, SelectedTimeRangeConfig, type SelectedTimeRangeConfigKey } from "../components/DhtChart.tsx";
+import { DhtChart, type SelectedTimeRangeConfigKey } from "../components/DhtChart.tsx";
 import { getLatestTelemetry } from "../clients/telemetry.tsx";
 import type {Telemetry} from "../models/Telemetry.ts";
+import {SelectedTimeRangeConfig} from "../components/SelectedTimeRangeConfig.tsx";
 
 interface DeviceDetailCardProps {
   device: Device;
