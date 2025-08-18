@@ -8,6 +8,7 @@ import {
   LineElement,
   PointElement,
   Tooltip,
+  Title,
 } from "chart.js";
 import {Line} from "react-chartjs-2";
 import {useEffect, useState} from "react";
@@ -21,7 +22,8 @@ ChartJS.register(
   PointElement,
   LineElement,
   Tooltip,
-  Legend
+  Legend,
+  Title
 );
 
 type Reading = {
@@ -46,6 +48,14 @@ type DhtChartProp = {
 
 export function DhtChart({ device, timeRange }: DhtChartProp) {
   const [readings, setReadings] = useState<Reading[]>([]);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  useEffect(() => {
+    const checkScreen = () => setIsSmallScreen(window.innerWidth < 576); // Bootstrap xs breakpoint
+    checkScreen();
+    window.addEventListener("resize", checkScreen);
+    return () => window.removeEventListener("resize", checkScreen);
+  }, []);
 
   useEffect(() => {
     const nowEpoch = Date.now();
@@ -128,7 +138,7 @@ export function DhtChart({ device, timeRange }: DhtChartProp) {
     labels,
     datasets: [
       {
-        label: "Temperature",
+        label: "Temperature (°C)",
         data: readings.map((r) => r.temperature),
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
@@ -146,7 +156,16 @@ export function DhtChart({ device, timeRange }: DhtChartProp) {
 
   const options: ChartOptions<"line"> = {
     responsive: true,
+    maintainAspectRatio: false,
     scales: {
+      x: {
+        ticks: isSmallScreen
+          ? { display: false }
+          : { maxTicksLimit: 4, maxRotation: 45, autoSkip: true },
+        grid: isSmallScreen
+          ? { drawTicks: false }
+          : {},
+      },
       y: {
         type: "linear",
         display: true,
@@ -163,7 +182,25 @@ export function DhtChart({ device, timeRange }: DhtChartProp) {
         min: 0
       },
     },
+    plugins: {
+      title: {
+        display: true,
+        text: "Temperature Readings (°C)",
+        font: {
+          size: 20,
+          weight: 'bold',
+        },
+        color: '#333',
+      },
+      legend: {
+        position: "bottom",
+        labels: { usePointStyle: true, boxWidth: 10 },
+      },
+    },
   };
-
-  return <Line data={data} options={options} />;
+  return (
+    <div style={{ width: "100%", height: isSmallScreen ? "250px" : "350px" }}>
+      <Line data={data} options={options} />
+    </div>
+  )
 }

@@ -8,16 +8,20 @@ type DropDownItem = {
 type DropdownComponentProps = {
   items: DropDownItem[];
   selectedItem: string;
-  onSelectItem: (key: string) => void;
+  onSelectItem: (key: any) => void;
+  defaultText: string;
 };
 
-function DropdownComponent({ items, selectedItem, onSelectItem }: DropdownComponentProps) {
+function DropdownComponent({ items, selectedItem, onSelectItem, defaultText }: DropdownComponentProps) {
   const selected = items.find((item) => item.key === selectedItem);
 
   return (
     <Dropdown>
-      <Dropdown.Toggle variant="success" id="dropdown-basic">
-        {selected ? selected.label : "Select an option"}
+      <Dropdown.Toggle
+        variant="success"
+        id="dropdown-basic"
+      >
+        {selected ? selected.label : defaultText}
       </Dropdown.Toggle>
 
       <Dropdown.Menu>
