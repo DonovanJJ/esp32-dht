@@ -68,7 +68,7 @@ void app_main(void)
     float temperature = 0;
     float humidity = 0;
 
-    if (read_dht11(&temperature, &humidity)) {
+    if (read_dht22(&temperature, &humidity)) {
         char payload[100];
         snprintf(payload, sizeof(payload),
                     "{\"device_id\": \"%s\", \"temperature\": %.1f, \"humidity\": %.1f}",

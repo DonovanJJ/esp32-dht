@@ -3,12 +3,12 @@
 
 #include "config.h"
 
-bool read_dht11(float *temperature, float *humidity)
+bool read_dht22(float *temperature, float *humidity)
 {
     int16_t temp_raw = 0;
     int16_t hum_raw = 0;
 
-    esp_err_t result = dht_read_data(DHT_TYPE_DHT11, DHT_GPIO, &hum_raw, &temp_raw);
+    esp_err_t result = dht_read_data(DHT_TYPE_AM2301, DHT_GPIO, &hum_raw, &temp_raw);
     if (result == ESP_OK) {
         *temperature = temp_raw / 10.0f;
         *humidity = hum_raw / 10.0f;

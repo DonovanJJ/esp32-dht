@@ -3,6 +3,6 @@
 
 #include <stdbool.h>
 
-bool read_dht11(float *temperature, float *humidity);
+bool read_dht22(float *temperature, float *humidity);
 
 #endif // DHT_SENSOR_H
