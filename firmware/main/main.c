@@ -5,6 +5,7 @@
 #include "esp_log.h"
 #include "sdkconfig.h"
 #include "nvs_flash.h"
+#include "esp_sleep.h"
 
 #include "secrets.h"
 #include "services/mqtt_manager.h"
@@ -64,19 +65,21 @@ void app_main(void)
 
     esp_mqtt_client_publish(mqtt_client, AWS_IOT_DEVICE_TOPIC, device_payload, 0, 1, 0);
 
-    while (1) {
-        float temperature = 0;
-        float humidity = 0;
+    float temperature = 0;
+    float humidity = 0;
 
-        if (read_dht11(&temperature, &humidity)) {
-            char payload[100];
-            snprintf(payload, sizeof(payload),
-                     "{\"device_id\": \"%s\", \"temperature\": %.1f, \"humidity\": %.1f}",
-                     DEVICE_ID, temperature, humidity);
+    if (read_dht11(&temperature, &humidity)) {
+        char payload[100];
+        snprintf(payload, sizeof(payload),
+                    "{\"device_id\": \"%s\", \"temperature\": %.1f, \"humidity\": %.1f}",
+                    DEVICE_ID, temperature, humidity);
 
-            esp_mqtt_client_publish(mqtt_client, AWS_IOT_DHT_TOPIC, payload, 0, 1, 0);
-        }
-
-        vTaskDelay(pdMS_TO_TICKS(60000));
+        esp_mqtt_client_publish(mqtt_client, AWS_IOT_DHT_TOPIC, payload, 0, 1, 0);
     }
+
+    const int64_t sleep_time_sec = 30;
+    esp_sleep_enable_timer_wakeup(sleep_time_sec * 1000000);
+
+    ESP_LOGI("MAIN", "Entering deep sleep for %lld seconds", sleep_time_sec);
+    esp_deep_sleep_start();
 }
