@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Card, CardBody, CardTitle, Container, Row, Col } from "react-bootstrap";
+import {Card, CardBody, CardTitle, Container, Row, Col, CardText} from "react-bootstrap";
 import Dropdown from "../components/DropdownComponent.tsx";
 import { getAvailableDevices } from "../clients/device.tsx";
 import type { Device } from "../models/Device.ts";
@@ -39,6 +39,13 @@ function DeviceDetailCard({ device, telemetry }: DeviceDetailCardProps) {
 
         {telemetry ? (
           <>
+            <CardText className="fw-semibold mb-3 text-center fs-6">
+              As of{" "}
+              <span className="text-primary">
+                {new Date(telemetry.timestamp).toLocaleString()}
+              </span>
+            </CardText>
+
             <Row className="text-center">
               <Col xs={6} className="border-end">
                 <div className="fw-bold fs-4 text-danger">
@@ -70,7 +77,7 @@ function Dashboard() {
   const [latestTelemetry, setLatestTelemetry] = useState<Telemetry>();
 
   useEffect(() => {
-    getAvailableDevices().then(setDevices);
+    getAvailableDevices().then(data => setDevices(data));
   }, []);
 
   useEffect(() => {
